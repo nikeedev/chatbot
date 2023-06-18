@@ -43,10 +43,9 @@ int main(int argc, char** argv)
 		// By default the result goes to standard output.
 		request.setOpt(new curlpp::options::WriteStream(&os));
      
-        request.perform();
-
-
-        std::cout << os.str() << std::endl;
+        request.perform();  
+        
+        std::cout << "os string: " << os.str() << std::endl;
 
         // json parsing
         json j;        
@@ -59,7 +58,7 @@ int main(int argc, char** argv)
             std::cerr << "parse error at byte " << ex.byte << std::endl;
         }
         
-        std::cout << j["choices"][0]["message"]["content"] << std::endl;
+        std::cout << "json value: " << j["choices"][0]["message"]["content"] << std::endl;
 
 	}
 
