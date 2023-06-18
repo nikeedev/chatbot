@@ -1,3 +1,5 @@
+#include <iostream>
+#include <string>
 #include <curlpp/cURLpp.hpp>
 #include <curlpp/Easy.hpp>
 #include <curlpp/Options.hpp>
@@ -12,7 +14,7 @@ int main(int argc, char** argv)
 {
 	try
 	{
-		curlpp::Cleanup myCleanup;
+		curlpp::Cleanup cleaner;
 		curlpp::Easy request;
 
         request.setOpt<curlpp::options::Url>("https://api.openai.com/v1/completions");
@@ -33,10 +35,32 @@ int main(int argc, char** argv)
         request.setOpt(new curlpp::options::HttpHeader(header)); 
         
         request.setOpt(new curlpp::options::PostFields(data));
+        
+
+        std::ostringstream os;
 
 		// Send request and get a result.
 		// By default the result goes to standard output.
-		request.perform();
+		request.setOpt(new curlpp::options::WriteStream(&os));
+     
+        request.perform();
+
+
+        std::cout << os.str() << std::endl;
+
+        // json parsing
+        json j;        
+        try
+        {
+            j = json::parse(os.str());
+        }
+        catch (json::parse_error& ex)
+        {
+            std::cerr << "parse error at byte " << ex.byte << std::endl;
+        }
+        
+        std::cout << j["choices"][0]["message"]["content"] << std::endl;
+
 	}
 
 	catch(curlpp::RuntimeError &e)
